@@ -1,0 +1,39 @@
+From 535736d321e39593847a508d4c82483908b8e9bd Mon Sep 17 00:00:00 2001
+From: Jens Reidel <jens@troet.org>
+Date: Thu, 9 Apr 2020 21:15:53 +0200
+Subject: [PATCH] fix aarch64
+
+---
+ src/Makefile | 9 ++++++---
+ 1 file changed, 6 insertions(+), 3 deletions(-)
+
+diff --git a/src/Makefile b/src/Makefile
+index 15ad6353..a71f6e5c 100644
+--- a/src/Makefile
++++ b/src/Makefile
+@@ -129,6 +129,12 @@ ifeq ($(ARCH),armv7)
+ 	prefetch = yes
+ endif
+ 
++ifeq ($(ARCH),aarch64)
++        arch = any
++        prefetch = yes
++        bits = 64
++endif
++
+ ifeq ($(ARCH),ppc-32)
+ 	arch = ppc
+ endif
+@@ -165,9 +171,6 @@ ifeq ($(COMP),gcc)
+ 			CXXFLAGS += -m$(bits)
+ 			LDFLAGS += -m$(bits)
+ 		endif
+-	else
+-		CXXFLAGS += -m$(bits)
+-		LDFLAGS += -m$(bits)
+ 	endif
+ 
+ 	ifneq ($(KERNEL),Darwin)
+-- 
+2.26.0
+
