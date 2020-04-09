@@ -1,0 +1,25 @@
+From 0d1fbfb34d2bf7f33feeae06c634bb41a1e4555d Mon Sep 17 00:00:00 2001
+From: Jens Reidel <jens@troet.org>
+Date: Thu, 9 Apr 2020 21:52:07 +0200
+Subject: [PATCH] aarch64 build
+
+---
+ makefile | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/makefile b/makefile
+index 714eb28..20c920c 100644
+--- a/makefile
++++ b/makefile
+@@ -154,7 +154,7 @@ C_DEPS :=
+ %.o: ./%.cpp
+ 	@echo 'Building file: $<'
+ 	@echo 'Invoking: GCC C++ Compiler'
+-	g++ -std=c++1z -O3 -DNDEBUG -msse4.2 -m64 -mpopcnt -pedantic -Wall -Wextra -c -fmessage-length=0 -Isrc -Isrc/book -Isrc/misc -Isrc/movegen -Isrc/position -Isrc/search -Isrc/uci -Isrc/utility -MMD -MP -MF"$(@:%.o=%.d)" -MT"$(@)" -o "$@" "$<"
++	g++ -std=c++1z -O3 -DNDEBUG -pedantic -Wall -Wextra -c -fmessage-length=0 -Isrc -Isrc/book -Isrc/misc -Isrc/movegen -Isrc/position -Isrc/search -Isrc/uci -Isrc/utility -MMD -MP -MF"$(@:%.o=%.d)" -MT"$(@)" -o "$@" "$<"
+ 	@echo 'Finished building: $<'
+ 	@echo ' '
+ 
+-- 
+2.26.0
+
