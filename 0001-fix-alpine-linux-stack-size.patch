@@ -27,14 +27,14 @@ index 15ad6353..9cb16178 100644
  	$(MAKE) ARCH=$(ARCH) COMP=$(COMP) \
  	EXTRACXXFLAGS='-fprofile-generate' \
 -	EXTRALDFLAGS='-lgcov' \
-+	EXTRALDFLAGS='-lgcov -Wl,-z,stack-size=271360' \
++	EXTRALDFLAGS='-lgcov -Wl,-z,stack-size=1073741824' \
  	all
  
  gcc-profile-use:
  	$(MAKE) ARCH=$(ARCH) COMP=$(COMP) \
  	EXTRACXXFLAGS='-fprofile-use -fno-peel-loops -fno-tracer' \
 -	EXTRALDFLAGS='-lgcov' \
-+	EXTRALDFLAGS='-lgcov -Wl,-z,stack-size=271360' \
++	EXTRALDFLAGS='-lgcov -Wl,-z,stack-size=1073741824' \
  	all
  
  icc-profile-make:
