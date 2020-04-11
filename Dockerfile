@@ -12,12 +12,23 @@ RUN apk add --virtual .deps git make gcc g++ && \
     git am < /0001-fix-alpine-linux-stack-size.patch && \
     git am < /0001-fix-aarch64.patch && \
     make profile-build ARCH=aarch64 -j $(nproc) && \
+    mv stockfish / && \
     cd ../.. && \
     git clone https://github.com/elcabesa/vajolet.git && \
     cd vajolet && \
     git am < /vajolet-aarch.patch && \
-    make -j $(nproc)
+    make -j $(nproc) && \
+    mv Vajolet / && \
+    cd / && \
+    rm -rf Stockfish && \
+    rm -rf vajolet && \
+    apk del .deps && \
+    apk add libgcc libstdc++ bash netcat-openbsd
 
-WORKDIR /Stockfish/src
+WORKDIR /
 
-CMD sleep 20
+COPY entrypoint .
+
+RUN chmod +x entrypoint
+
+ENTRYPOINT ./entrypoint
