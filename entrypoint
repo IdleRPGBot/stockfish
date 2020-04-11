@@ -1,4 +1,8 @@
 #!/bin/bash
 echo "Starting Stockfish on port 4000..."
-coproc ./stockfish
-nc -l -p 4000 <&"${COPROC[0]}" >&"${COPROC[1]}"
+while :
+do
+  coproc ./stockfish
+  nc -l -p 4000 <&"${COPROC[0]}" >&"${COPROC[1]}"
+  echo "Restarting..."
+done
