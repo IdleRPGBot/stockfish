@@ -2,6 +2,7 @@
 echo "Starting Stockfish on port 4000..."
 while :
 do
+  killall stockfish || true
   coproc ./stockfish
   nc -l -p 4000 <&"${COPROC[0]}" >&"${COPROC[1]}"
   echo "Restarting..."
