@@ -3,7 +3,8 @@ FROM alpine:edge
 COPY 0001-fix-alpine-linux-stack-size.patch .
 COPY 0001-fix-aarch64.patch .
 
-RUN apk add --virtual .fetch --no-cache curl && \
+RUN apk upgrade --no-cache && \
+    apk add --virtual .fetch --no-cache curl && \
     curl https://ftp.travitia.xyz/alpine/jens@troet.org-5ea01144.rsa.pub -o /etc/apk/keys/jens@troet.org-5ea01144.rsa.pub && \
     echo "https://ftp.travitia.xyz/alpine" >> /etc/apk/repositories && \
     apk add --virtual .deps --no-cache git make gcc g++ && \
@@ -13,13 +14,13 @@ RUN apk add --virtual .fetch --no-cache curl && \
     cd Stockfish/src && \
     git am < /0001-fix-alpine-linux-stack-size.patch && \
     git am < /0001-fix-aarch64.patch && \
-    export LDFLAGS="-static" && \
     make profile-build ARCH=aarch64 -j $(nproc) && \
     mv stockfish / && \
     cd .. && \
     rm -rf Stockfish && \
-    apk del --no-network .deps .fetch && \
-    apk add --no-cache netcat-openbsd bash
+    apk del --no-network .deps && \
+    apk add --no-cache netcat-openbsd bash libgcc libstdc++ && \
+    apk del --no-network .fetch
 
 WORKDIR /
 
