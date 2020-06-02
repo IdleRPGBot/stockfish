@@ -1,4 +1,4 @@
-FROM alpine:edge
+FROM gelbpunkt/python:gcc10
 
 COPY 0001-fix-alpine-linux-stack-size.patch .
 COPY 0001-fix-aarch64.patch .
@@ -19,13 +19,11 @@ RUN apk upgrade --no-cache && \
     cd .. && \
     rm -rf Stockfish && \
     apk del --no-network .deps && \
-    apk add --no-cache netcat-openbsd bash libgcc libstdc++ && \
+    apk add --no-cache libgcc libstdc++ && \
     apk del --no-network .fetch
 
 WORKDIR /
 
-COPY entrypoint .
+COPY server.py .
 
-RUN chmod +x entrypoint
-
-ENTRYPOINT ./entrypoint
+CMD python3 server.py
