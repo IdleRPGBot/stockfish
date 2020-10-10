@@ -12,7 +12,7 @@ fn handle_client(stream: TcpStream) {
         unsafe {
             let stdio1 = Stdio::from_raw_fd(fd);
             let stdio2 = Stdio::from_raw_fd(other_fd);
-            Command::new("./stockfish")
+            Command::new("/usr/bin/stockfish")
                 .stdin(stdio1)
                 .stdout(stdio2)
                 .spawn()
