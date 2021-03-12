@@ -23,7 +23,7 @@ compile-arm64:
         --build-arg RUST_TARGET="aarch64-unknown-linux-musl"
         --build-arg MUSL_TARGET="aarch64-linux-musl"
         --build-arg STOCKFISH_TARGET="armv8"
-        --build-arg FINAL_TARGET="arm64v8"
+        --build-arg FINAL_TARGET="aarch64"
         -t stockfish:arm64 .
     - if [ "$CI_COMMIT_BRANCH" == "$CI_DEFAULT_BRANCH" ] && [ "$QUAY_USERNAME" != "" ] && [ "$QUAY_PASSWORD" != "" ]; then
         podman --storage-driver vfs login quay.io --username $QUAY_USERNAME --password $QUAY_PASSWORD &&

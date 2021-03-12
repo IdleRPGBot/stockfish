@@ -4,11 +4,9 @@ ARG RUST_TARGET="x86_64-unknown-linux-musl"
 ARG MUSL_TARGET="x86_64-linux-musl"
 # Stockfish target, e.g. x86-64-modern or armv8
 ARG STOCKFISH_TARGET="x86-64-modern"
-# This ONLY works with defaults which is rather annoying
-# but better than nothing
-# Uses docker's own naming for architectures
-# e.g. x86_64 -> amd64, aarch64 -> arm64v8, arm -> arm32v7
-ARG FINAL_TARGET="amd64"
+# Final architecture used by Alpine
+# Uses Kernel Naming (aarch64, armv7, x86_64, s390x, ppc64le)
+ARG FINAL_TARGET="x86_64"
 
 FROM docker.io/library/alpine:edge AS builder
 ARG MUSL_TARGET
@@ -18,8 +16,8 @@ ARG STOCKFISH_TARGET
 COPY 0001-fix-alpine-linux-stack-size.patch .
 COPY server.rs .
 
-ENV CXXFLAGS "-static-libstdc++ -static-libgcc"
-ENV CFLAGS "-static-libstdc++ -static-libgcc"
+ENV CXXFLAGS "-static -static-libstdc++ -static-libgcc"
+ENV CFLAGS "-static -static-libstdc++ -static-libgcc"
 
 RUN apk upgrade && \
     apk add curl libgcc git make && \
@@ -56,14 +54,25 @@ RUN source $HOME/.cargo/env && \
     cd .. && \
     rm -rf Stockfish && \
     cd / && \
-    rustc -C opt-level=3 -C linker=${MUSL_TARGET}-ld --target=${RUST_TARGET} server.rs && \
+    rustc -C opt-level=3 -C debuginfo=0 -C codegen-units=1 -C incremental=false -C lto=yes -C panic=abort -C linker=${MUSL_TARGET}-ld --target=${RUST_TARGET} server.rs && \
     actual-strip server
 
-FROM docker.io/${FINAL_TARGET}/alpine:edge
+FROM docker.io/library/alpine:edge AS dumb-init
+ARG FINAL_TARGET
 
-WORKDIR /
+RUN apk update && \
+    VERSION=$(apk search dumb-init) && \
+    mkdir out && \
+    cd out && \
+    wget "https://dl-cdn.alpinelinux.org/alpine/edge/community/$FINAL_TARGET/$VERSION.apk" -O dumb-init.apk && \
+    tar xf dumb-init.apk && \
+    mv usr/bin/dumb-init /dumb-init
 
-COPY --from=builder /server /usr/bin/server
-COPY --from=builder /stockfish /usr/bin/stockfish
+FROM scratch
 
-CMD /usr/bin/server
+COPY --from=dumb-init /dumb-init /dumb-init
+COPY --from=builder /server /server
+COPY --from=builder /stockfish /stockfish
+
+ENTRYPOINT ["./dumb-init", "--"]
+CMD ["./server"]
