@@ -39,6 +39,6 @@ publish-latest:
     - podman --storage-driver vfs manifest create stockfish:latest
     - podman --storage-driver vfs pull quay.io/$QUAY_USERNAME/stockfish:arm64
     - podman --storage-driver vfs pull quay.io/$QUAY_USERNAME/stockfish:amd64
-    - podman --storage-driver vfs manifest add stockfish:latest stockfish:amd64
-    - podman --storage-driver vfs manifest add stockfish:latest stockfish:arm64
+    - podman --storage-driver vfs manifest add stockfish:latest quay.io/$QUAY_USERNAME/stockfish:amd64
+    - podman --storage-driver vfs manifest add stockfish:latest quay.io/$QUAY_USERNAME/stockfish:arm64
     - podman --storage-driver vfs manifest push stockfish:latest docker://quay.io/$QUAY_USERNAME/stockfish:latest
