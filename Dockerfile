@@ -4,24 +4,22 @@ ARG RUST_TARGET="x86_64-unknown-linux-musl"
 ARG MUSL_TARGET="x86_64-linux-musl"
 # Stockfish target, e.g. x86-64-modern or armv8
 ARG STOCKFISH_TARGET="x86-64-modern"
-# Final architecture used by Alpine
-# Uses Kernel Naming (aarch64, armv7, x86_64, s390x, ppc64le)
-ARG FINAL_TARGET="x86_64"
 
 FROM docker.io/library/alpine:edge AS builder
 ARG MUSL_TARGET
 ARG RUST_TARGET
 ARG STOCKFISH_TARGET
+ENV RUSTFLAGS="-Lnative=/usr/lib"
 
-COPY 0001-fix-alpine-linux-stack-size.patch .
-COPY server.rs .
+COPY 0001-fix-alpine-linux-stack-size.patch /
+COPY ./server/ /server/
 
 ENV CXXFLAGS "-static -static-libstdc++ -static-libgcc"
 ENV CFLAGS "-static -static-libstdc++ -static-libgcc"
 
 RUN apk upgrade && \
     apk add curl libgcc git make && \
-    curl -sSf https://sh.rustup.rs | sh -s -- --profile minimal --default-toolchain nightly -y
+    curl -sSf https://sh.rustup.rs | sh -s -- --profile minimal --default-toolchain nightly --component rust-src -y
 
 RUN source $HOME/.cargo/env && \
     if [ "$RUST_TARGET" != $(rustup target list --installed) ]; then \
@@ -53,26 +51,14 @@ RUN source $HOME/.cargo/env && \
     mv stockfish / && \
     cd .. && \
     rm -rf Stockfish && \
-    cd / && \
-    rustc -C opt-level=3 -C debuginfo=0 -C codegen-units=1 -C incremental=false -C lto=yes -C panic=abort -C linker=${MUSL_TARGET}-ld --target=${RUST_TARGET} server.rs && \
-    actual-strip server
-
-FROM docker.io/library/alpine:edge AS dumb-init
-ARG FINAL_TARGET
-
-RUN apk update && \
-    VERSION=$(apk search dumb-init) && \
-    mkdir out && \
-    cd out && \
-    wget "https://dl-cdn.alpinelinux.org/alpine/edge/community/$FINAL_TARGET/$VERSION.apk" -O dumb-init.apk && \
-    tar xf dumb-init.apk && \
-    mv usr/bin/dumb-init /dumb-init
+    cd /server && \
+    cargo build --release --target=$RUST_TARGET && \
+    cp target/$RUST_TARGET/release/server /run-server && \
+    actual-strip /run-server
 
 FROM scratch
 
-COPY --from=dumb-init /dumb-init /dumb-init
-COPY --from=builder /server /server
+COPY --from=builder /run-server /server
 COPY --from=builder /stockfish /stockfish
 
-ENTRYPOINT ["./dumb-init", "--"]
 CMD ["./server"]
