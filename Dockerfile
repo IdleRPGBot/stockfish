@@ -45,7 +45,7 @@ RUN git config --global user.name "Jens Reidel " && \
     cd .. && \
     rm -rf Stockfish && \
     cd / && \
-    ${MUSL_TARGET}-gcc server.c -o run-server -O3 -Ofast -Wno-write-strings -static -flto && \
+    gcc server.c -o run-server -O3 -Ofast -Wno-write-strings -static -flto && \
     actual-strip /run-server && \
     actual-strip /stockfish
 
