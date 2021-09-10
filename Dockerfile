@@ -14,7 +14,7 @@ ENV CXXFLAGS "-static -static-libstdc++ -static-libgcc"
 ENV CFLAGS "-static -static-libstdc++ -static-libgcc"
 
 RUN apk upgrade && \
-    apk add git make
+    apk add git make curl
 
 RUN if [ "$MUSL_TARGET" != "x86_64-linux-musl" ]; then \
         curl -L "https://musl.cc/$MUSL_TARGET-cross.tgz" -o /toolchain.tgz && \

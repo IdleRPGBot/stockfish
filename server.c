@@ -1,5 +1,5 @@
 /*
-** server.c -- a stream socket server demo
+** server.c -- streaming tcp server that forks stockfish processes and proxies them over tcp
 */
 
 #include <arpa/inet.h>
@@ -19,6 +19,13 @@
 #define PORT "4000" // the port users will be connecting to
 
 #define BACKLOG 10 // how many pending connections queue will hold
+
+#define CHECKED(expr)            \
+    if (expr < 0)                \
+    {                            \
+        perror("error: " #expr); \
+        return 1;                \
+    }
 
 void sigchld_handler(int s)
 {
@@ -66,26 +73,16 @@ int main(void)
     hints.ai_socktype = SOCK_STREAM;
     hints.ai_flags = AI_PASSIVE; // use my IP
 
-    if ((rv = getaddrinfo(NULL, PORT, &hints, &servinfo)) != 0)
-    {
-        fprintf(stderr, "getaddrinfo: %s\n", gai_strerror(rv));
-        return 1;
-    }
+    rv = getaddrinfo(NULL, PORT, &hints, &servinfo);
+    CHECKED(rv);
 
     // loop through all the results and bind to the first we can
     for (p = servinfo; p != NULL; p = p->ai_next)
     {
-        if ((sockfd = socket(p->ai_family, p->ai_socktype, p->ai_protocol)) == -1)
-        {
-            perror("server: socket");
-            continue;
-        }
+        sockfd = socket(p->ai_family, p->ai_socktype, p->ai_protocol);
+        CHECKED(sockfd);
 
-        if (setsockopt(sockfd, SOL_SOCKET, SO_REUSEADDR, &yes, sizeof(int)) == -1)
-        {
-            perror("setsockopt");
-            exit(1);
-        }
+        CHECKED(setsockopt(sockfd, SOL_SOCKET, SO_REUSEADDR, &yes, sizeof(int)));
 
         if (bind(sockfd, p->ai_addr, p->ai_addrlen) == -1)
         {
@@ -105,20 +102,12 @@ int main(void)
         exit(1);
     }
 
-    if (listen(sockfd, BACKLOG) == -1)
-    {
-        perror("listen");
-        exit(1);
-    }
+    CHECKED(listen(sockfd, BACKLOG));
 
     sa.sa_handler = sigchld_handler; // reap all dead processes
     sigemptyset(&sa.sa_mask);
     sa.sa_flags = SA_RESTART;
-    if (sigaction(SIGCHLD, &sa, NULL) == -1)
-    {
-        perror("sigaction");
-        exit(1);
-    }
+    CHECKED(sigaction(SIGCHLD, &sa, NULL));
 
     printf("server: waiting for connections...\n");
 
