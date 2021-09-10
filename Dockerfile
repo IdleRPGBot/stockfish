@@ -36,7 +36,7 @@ RUN git config --global user.name "Jens Reidel " && \
     git clone https://github.com/official-stockfish/Stockfish.git && \
     cd Stockfish/src && \
     git am < /0001-fix-alpine-linux-stack-size.patch && \
-    if [[ "$(uname -a)" != "*x86_64*" ]]; then \
+    if [ "$MUSL_TARGET" != "x86_64-linux-musl" ]; then \
         make build ARCH=${STOCKFISH_TARGET} -j $(nproc); \
     else \
         make profile-build ARCH=${STOCKFISH_TARGET} -j $(nproc); \
