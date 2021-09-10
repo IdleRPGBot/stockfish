@@ -20,7 +20,6 @@ compile-arm64:
   stage: Compiles
   script:
     - podman build --runtime crun --storage-driver vfs --arch arm64
-        --build-arg RUST_TARGET="aarch64-unknown-linux-musl"
         --build-arg MUSL_TARGET="aarch64-linux-musl"
         --build-arg STOCKFISH_TARGET="armv8"
         -t stockfish:arm64 .
