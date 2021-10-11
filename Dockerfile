@@ -10,8 +10,8 @@ ARG STOCKFISH_TARGET
 COPY 0001-fix-alpine-linux-stack-size.patch .
 COPY server.c .
 
-ENV CXXFLAGS "-static -static-libstdc++ -static-libgcc"
-ENV CFLAGS "-static -static-libstdc++ -static-libgcc"
+ENV CXXFLAGS "-static -static-libstdc++ -static-libgcc -march=znver3"
+ENV CFLAGS "-static -static-libstdc++ -static-libgcc -march=znver3"
 
 RUN apk upgrade && \
     apk add git make curl
