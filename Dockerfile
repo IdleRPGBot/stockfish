@@ -39,8 +39,8 @@ RUN git config --global user.name "Jens Reidel " && \
     if [ "$MUSL_TARGET" != "x86_64-linux-musl" ]; then \
         make build ARCH=${STOCKFISH_TARGET} -j $(nproc); \
     else \
-        export CFLAGS="$CFLAGS -march=znver3" && \
-        export CXXFLAGS="$CXXFLAGS -march=znver3" && \
+        export CFLAGS="$CFLAGS -march=znver3 -mtune=znver3" && \
+        export CXXFLAGS="$CXXFLAGS -march=znver3 -mtune=znver3" && \
         make profile-build ARCH=${STOCKFISH_TARGET} -j $(nproc); \
     fi && \
     mv stockfish / && \
