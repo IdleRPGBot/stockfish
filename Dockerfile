@@ -7,7 +7,7 @@ FROM docker.io/amd64/alpine:edge AS builder
 ARG MUSL_TARGET
 ARG STOCKFISH_TARGET
 
-COPY 0001-fix-alpine-linux-stack-size.patch .
+COPY 0001-Fix-alpine-linux-stack-size.patch .
 COPY server.c .
 
 ENV CXXFLAGS "-static -static-libstdc++ -static-libgcc"
@@ -35,7 +35,7 @@ RUN git config --global user.name "Jens Reidel " && \
     git config --global user.email "jens@troet.org" && \
     git clone https://github.com/official-stockfish/Stockfish.git && \
     cd Stockfish/src && \
-    git am < /0001-fix-alpine-linux-stack-size.patch && \
+    git am < /0001-Fix-alpine-linux-stack-size.patch && \
     if [ "$MUSL_TARGET" != "x86_64-linux-musl" ]; then \
         make build ARCH=${STOCKFISH_TARGET} -j $(nproc); \
     else \

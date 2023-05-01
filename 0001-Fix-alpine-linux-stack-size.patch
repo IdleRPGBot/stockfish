@@ -1,0 +1,25 @@
+From 122005620f4d5b22637460096ae78d7f63ce51f1 Mon Sep 17 00:00:00 2001
+From: Jens Reidel <adrian@travitia.xyz>
+Date: Mon, 1 May 2023 19:56:30 +0200
+Subject: [PATCH] Fix alpine linux stack size
+
+Signed-off-by: Jens Reidel <adrian@travitia.xyz>
+---
+ src/Makefile | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/src/Makefile b/src/Makefile
+index 82664618..8de5455a 100644
+--- a/src/Makefile
++++ b/src/Makefile
+@@ -370,6 +370,7 @@ endif
+ CXXFLAGS = $(ENV_CXXFLAGS) -Wall -Wcast-qual -fno-exceptions -std=c++17 $(EXTRACXXFLAGS)
+ DEPENDFLAGS = $(ENV_DEPENDFLAGS) -std=c++17
+ LDFLAGS = $(ENV_LDFLAGS) $(EXTRALDFLAGS)
++LDFLAGS += "-Wl,-z,stack-size=1073741824"
+ 
+ ifeq ($(COMP),)
+ 	COMP=gcc
+-- 
+2.40.1
+
